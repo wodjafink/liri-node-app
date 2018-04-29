@@ -19,6 +19,7 @@
   "homepage": "https://github.com/wodjafink/liri-node-app#readme",
   "dependencies": {
     "dotenv": "^5.0.1",
+    "node-spotify-api": "^1.0.7",
     "npm": "^6.0.0",
     "twitter": "^1.7.1"
   }
