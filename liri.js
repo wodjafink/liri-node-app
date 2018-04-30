@@ -172,8 +172,8 @@ function doMovie(movieQuery){
 			  			userMovieEntry.setActors(imdbMovie.Actors)
 						userMovieEntry.displayMovie();
 					})
-					//Adding a return here to only print one movie
   				}
+				//Adding a return here to only print one movie
   				return i === 1;
   			})
 		})
@@ -220,7 +220,6 @@ switch (doThis)
 		doMovie(process.argv[3]);
 		break;
 	case "do-what-it-says":
-		console.log("Begin do-what-it-says")
 		fs.readFile("random.txt", "utf8", function(err, data){
 			var partsOfStr = data.split(',');
 
@@ -231,7 +230,6 @@ switch (doThis)
 					doTwitter();
 					break;
 				case "spotify-this-song":
-					console.log("Do what it says spotify " + queryArg);
 					doSpotify(queryArg);
 					break;
 				case "movie-this":
