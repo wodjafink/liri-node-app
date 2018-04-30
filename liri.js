@@ -97,9 +97,10 @@ switch (doThis)
 	  			if (err) {
 	    			return console.log('Error occurred: ' + err);
 	  			}
-
-	  			data.tracks.items.forEach(function(item){
+	  			var i = 0;
+	  			data.tracks.items.some(function(item){
 	  				if (item.name.toLowerCase() === process.argv[3].toLowerCase()){  					
+		  				i++;
 		  				console.log("Artists: ")
 		  				item.artists.forEach(function(artist){
 		  					console.log("\t * " + artist.name)
@@ -108,6 +109,7 @@ switch (doThis)
 		  				console.log("Preview: " + item.preview_url)
 		  				console.log("Album Name: " + item.album.name)
 	  				}
+	  				return i === 1;
 	  			})
 			});
 		} else {
@@ -116,9 +118,10 @@ switch (doThis)
 	  			if (err) {
 	    			return console.log('Error occurred: ' + err);
 	  			}
-
-	  			data.tracks.items.forEach(function(item){
+	  			var i = 0;
+	  			data.tracks.items.some(function(item){
 	  				if (item.name === "The Sign"){  					
+		  				i++;
 		  				console.log("Artists: ")
 		  				item.artists.forEach(function(artist){
 		  					console.log("\t * " + artist.name)
@@ -127,6 +130,7 @@ switch (doThis)
 		  				console.log("Preview: " + item.preview_url)
 		  				console.log("Album Name: " + item.album.name)
 	  				}
+	  				return i === 1;
 	  			})
 			});
 		}
@@ -140,7 +144,9 @@ switch (doThis)
 	    			return console.log('Error occurred: ' + err);
 	  			}
 	  			var movies = JSON.parse(body);
-	  			movies.Search.forEach(function(movie){
+	  			var i = 0;
+	  			movies.Search.some(function(movie){
+	  				i++;
 	  				if (movie.Title === userMovieEntry.name){
 	  					userMovieEntry.setYear(movie.Year);
 	  					userMovieEntry.setID(movie.imdbID);
@@ -160,11 +166,10 @@ switch (doThis)
 				  			userMovieEntry.setPlot(imdbMovie.Plot)
 				  			userMovieEntry.setActors(imdbMovie.Actors)
 							userMovieEntry.displayMovie();
-							return;
 						})
 						//Adding a return here to only print one movie
-						return;
 	  				}
+	  				return i === 1;
 	  			})
 			})
 		} else {
