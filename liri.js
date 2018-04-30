@@ -99,7 +99,7 @@ switch (doThis)
 	  			}
 
 	  			data.tracks.items.forEach(function(item){
-	  				if (item.name === process.argv[3]){  					
+	  				if (item.name.toLowerCase() === process.argv[3].toLowerCase()){  					
 		  				console.log("Artists: ")
 		  				item.artists.forEach(function(artist){
 		  					console.log("\t * " + artist.name)
