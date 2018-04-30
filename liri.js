@@ -1,6 +1,7 @@
 require("dotenv").config();
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api')
+var request = require('request')
 var key = require('./key.js')
 
 var client = new Twitter({
@@ -18,6 +19,62 @@ var spotify = new Spotify({
 var params = {screen_name: 'jmednick_tw'};
 
 var doThis = process.argv[2]
+
+function movieEntry(name, formattedName){
+	this.name = name;
+	this.formattedName = formattedName;
+	this.ID = "";
+	this.year = "";
+	this.imdbRating = "";
+	this.rottenTomatoesRating = "";
+	this.country = "";
+	this.language = "";
+	this.plot = "";
+	this.actors = "";
+
+	this.setID = function(ID){
+		this.ID = ID;
+	}
+
+	this.setYear = function(year){
+		this.year = year;
+	}
+
+	this.setimdbRating = function(imdbRating){
+		this.imdbRating = imdbRating;
+	}
+
+	this.setRottenTomatoesRating = function(rating){
+		this.rottenTomatoesRating = rating;
+	}
+
+	this.setCountry = function(country){
+		this.country = country;
+	}
+
+	this.setLanguage = function(language){
+		this.language = language;
+	}
+
+	this.setPlot = function(plot){
+		this.plot = plot;
+	}
+
+	this.setActors = function(actors){
+		this.actors = actors;
+	}
+
+	this.displayMovie = function(){
+		console.log("Title: " + this.name);
+		console.log("Year: " + this.year)
+		console.log("IMDB Rating: " + this.imdbRating);
+		console.log("Rotten Tomatoes Score: " + this.rottenTomatoesRating)
+		console.log("Countries where produced: " + this.country);
+		console.log("Language(s): " + this.language)
+		console.log("Plot: " + this.plot)
+		console.log("Actors: " + this.actors)
+	}
+}
 
 switch (doThis)
 {
@@ -76,6 +133,68 @@ switch (doThis)
 		break;
 	case "movie-this":
 		console.log("Begin movie-this")
+		if (process.argv[3]){
+			var userMovieEntry = new movieEntry(process.argv[3], process.argv[3].replace(/ /g,"-"));
+			request('http://www.omdbapi.com/?apikey=trilogy&s=' + userMovieEntry.formattedName, function(err, response, body){
+	  			if (err) {
+	    			return console.log('Error occurred: ' + err);
+	  			}
+	  			var movies = JSON.parse(body);
+	  			movies.Search.forEach(function(movie){
+	  				if (movie.Title === userMovieEntry.name){
+	  					userMovieEntry.setYear(movie.Year);
+	  					userMovieEntry.setID(movie.imdbID);
+						request('http://www.omdbapi.com/?apikey=trilogy&i=' + userMovieEntry.ID, function(err, response, body){
+							if (err) {
+				    			return console.log('Error occurred: ' + err);
+				  			}
+				  			var imdbMovie = JSON.parse(body);
+				  			userMovieEntry.setimdbRating(imdbMovie.imdbRating);
+				  			if (imdbMovie.Ratings[1] != undefined){
+					  			userMovieEntry.setRottenTomatoesRating(imdbMovie.Ratings[1].Value)
+				  			} else {
+				  				userMovieEntry.setRottenTomatoesRating(" No Rating Sorry! ")
+				  			}
+				  			userMovieEntry.setCountry(imdbMovie.Country);
+				  			userMovieEntry.setLanguage(imdbMovie.Language)
+				  			userMovieEntry.setPlot(imdbMovie.Plot)
+				  			userMovieEntry.setActors(imdbMovie.Actors)
+							userMovieEntry.displayMovie();
+							return;
+						})
+						//Adding a return here to only print one movie
+						return;
+	  				}
+	  			})
+			})
+		} else {
+			var defaultMovieEntry = new movieEntry('Mr. Nobody', 'Mr-Nobody');
+			request('http://www.omdbapi.com/?apikey=trilogy&s=' + defaultMovieEntry.formattedName, function(err, response, body){
+	  			if (err) {
+	    			return console.log('Error occurred: ' + err);
+	  			}
+	  			var movies = JSON.parse(body);
+	  			movies.Search.forEach(function(movie){
+	  				if ((movie.Title === "Mr. Nobody") && (movie.Year === '2009')){
+	  					defaultMovieEntry.setYear(movie.Year);
+	  					defaultMovieEntry.setID(movie.imdbID);
+						request('http://www.omdbapi.com/?apikey=trilogy&i=' + defaultMovieEntry.ID, function(err, response, body){
+							if (err) {
+				    			return console.log('Error occurred: ' + err);
+				  			}
+				  			var imdbMovie = JSON.parse(body);
+				  			defaultMovieEntry.setimdbRating(imdbMovie.imdbRating);
+				  			defaultMovieEntry.setRottenTomatoesRating(imdbMovie.Ratings[1].Value)
+				  			defaultMovieEntry.setCountry(imdbMovie.Country);
+				  			defaultMovieEntry.setLanguage(imdbMovie.Language)
+				  			defaultMovieEntry.setPlot(imdbMovie.Plot)
+				  			defaultMovieEntry.setActors(imdbMovie.Actors)
+							defaultMovieEntry.displayMovie();
+						})
+	  				}
+	  			})
+			})
+		}
 		break;
 	case "do-what-it-says":
 		console.log("Begin do-what-it-says")
