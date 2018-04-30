@@ -89,16 +89,20 @@ function doTwitter(){
 	});
 }
 
-function doSpotify(){
-	if (process.argv[3]) {
+function doSpotify(song){
+	if (song != undefined) {
+		song = song.replace(/\"/g, "")
+		song = song.replace(/\r?\n|\r/g, "")
+		console.log("Updated to " + song);
 		// Search for the query defined by the user
-		spotify.search({ type: 'track', query: process.argv[3] }, function(err, data) {
+		spotify.search({ type: 'track', query: song }, function(err, data) {
   			if (err) {
     			return console.log('Error occurred: ' + err);
   			}
   			var i = 0;
   			data.tracks.items.some(function(item){
-  				if (item.name.toLowerCase() === process.argv[3].toLowerCase()){  					
+  				// console.log("Compare :" + item.name.toLowerCase() + ": to :" + song.toLowerCase() + ":")
+  				if (item.name.toLowerCase() === song.toLowerCase()){  					
 	  				i++;
 	  				console.log("Artists: ")
 	  				item.artists.forEach(function(artist){
@@ -135,9 +139,11 @@ function doSpotify(){
 	}
 }
 
-function doMovie(){
-	if (process.argv[3]){
-		var userMovieEntry = new movieEntry(process.argv[3], process.argv[3].replace(/ /g,"-"));
+function doMovie(movieQuery){
+	if (movieQuery != undefined){
+		movieQuery = movieQuery.replace(/\"/g, "")
+		movieQuery = movieQuery.replace(/\r?\n|\r/g, "")
+		var userMovieEntry = new movieEntry(movieQuery, movieQuery.replace(/ /g,"-"));
 		request('http://www.omdbapi.com/?apikey=trilogy&s=' + userMovieEntry.formattedName, function(err, response, body){
   			if (err) {
     			return console.log('Error occurred: ' + err);
@@ -208,19 +214,30 @@ switch (doThis)
 		doTwitter();
 		break;
 	case "spotify-this-song":
-		doSpotify();
+		doSpotify(process.argv[3]);
 		break;
 	case "movie-this":
-		doMovie();
+		doMovie(process.argv[3]);
 		break;
 	case "do-what-it-says":
 		console.log("Begin do-what-it-says")
 		fs.readFile("random.txt", "utf8", function(err, data){
 			var partsOfStr = data.split(',');
 
-			partsOfStr.forEach(function(str){
-				console.log(str)
-			})
+			var cmdArg = partsOfStr[0];
+			var queryArg = partsOfStr[1];
+			switch (cmdArg){
+				case "my-tweets":
+					doTwitter();
+					break;
+				case "spotify-this-song":
+					console.log("Do what it says spotify " + queryArg);
+					doSpotify(queryArg);
+					break;
+				case "movie-this":
+					doMovie(queryArg);
+					break;
+			}
 		})
 		break;
 	default:
